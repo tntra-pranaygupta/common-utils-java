@@ -47,29 +47,6 @@ public final class SensitiveDataMasker {
         // utility class – not instantiable
     }
 
-    // ─── PAN masking ──────────────────────────────────────────────────────────
-
-    /**
-     * Masks a standalone PAN value, preserving only the last 4 digits.
-     *
-     * <p>Returns {@code "****"} for null or short inputs to prevent NullPointerException
-     * in log arguments.</p>
-     *
-     * @param pan raw PAN string (may be null)
-     * @return masked string safe for logging
-     */
-    public static String maskPan(String pan) {
-        if (pan == null || pan.length() < 4) {
-            return "****";
-        }
-        // Strip spaces/dashes before extracting last 4
-        String digits = pan.replaceAll("[\\s\\-]", "");
-        if (digits.length() < 4) {
-            return "****";
-        }
-        return PAN_MASK_PREFIX + digits.substring(digits.length() - 4);
-    }
-
     /**
      * Scans arbitrary text and replaces any PAN-like digit sequences with a
      * masked representation. This provides a defensive safety net when raw

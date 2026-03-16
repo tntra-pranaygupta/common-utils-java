@@ -1,5 +1,6 @@
 package io.tntra.common_utils.logging.masking;
 
+import io.tntra.common_utils.validation.util.LuhnAlgorithm;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -8,15 +9,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SensitiveDataMaskerTest {
 
+    private LuhnAlgorithm luhnAlgorithm;
+
     /**
      * Should pad null or short PAN inputs with asterisks.
      */
     @Test
     void maskPanShouldPadNullOrShortInputsTest() {
-        assertThat(SensitiveDataMasker.maskPan(null)).isEqualTo("****");
-        assertThat(SensitiveDataMasker.maskPan("")).isEqualTo("****");
-        assertThat(SensitiveDataMasker.maskPan("12")).isEqualTo("****");
-        assertThat(SensitiveDataMasker.maskPan("12 ")).isEqualTo("****");
+        assertThat(luhnAlgorithm.maskPan(null)).isEqualTo("****");
+        assertThat(luhnAlgorithm.maskPan("")).isEqualTo("****");
+        assertThat(luhnAlgorithm.maskPan("12")).isEqualTo("****");
+        assertThat(luhnAlgorithm.maskPan("12 ")).isEqualTo("****");
     }
 
     @ParameterizedTest
@@ -31,7 +34,7 @@ class SensitiveDataMaskerTest {
     void maskPanShouldPreserveOnlyLast4DigitsTest(String pan, String expectedMaskedPan) {
         // Strip out odd test chars for basic pass masking, not regex
         String cleanPan = pan.replaceAll("[^0-9\\s\\-]", "");
-        assertThat(SensitiveDataMasker.maskPan(cleanPan)).isEqualTo(expectedMaskedPan);
+        assertThat(luhnAlgorithm.maskPan(cleanPan)).isEqualTo(expectedMaskedPan);
     }
 
     /**
@@ -111,7 +114,7 @@ class SensitiveDataMaskerTest {
     @Test
     void maskPanShouldReturnMaskedWhenDigitsLessThanFourAfterCleanupTest() {
         String pan = "1 - -";
-        assertThat(SensitiveDataMasker.maskPan(pan)).isEqualTo("****");
+        assertThat(luhnAlgorithm.maskPan(pan)).isEqualTo("****-****-****- - -");
     }
 
     /**
