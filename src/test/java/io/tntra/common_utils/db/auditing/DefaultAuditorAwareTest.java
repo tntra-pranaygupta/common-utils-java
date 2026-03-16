@@ -9,8 +9,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class DefaultAuditorAwareTest {
     private final DefaultAuditorAware auditorAware = new DefaultAuditorAware();
 
+    /**
+     * Should return 'system' as auditor when security context is not available.
+     */
     @Test
-    void shouldReturnSystemWhenSecurityContextNotAvailable() {
+    void shouldReturnSystemWhenSecurityContextNotAvailableTest() {
         Optional<String> auditor = auditorAware.getCurrentAuditor();
 
         assertThat(auditor).isPresent();

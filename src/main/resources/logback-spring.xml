@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+        Standard logback configuration for the common-utils library.
+        Includes correlation_id from MDC in every log line where available.
+        PCI DSS Note: PAN and sensitive PII are masked programmatically BEFORE reaching the logger.
+    -->
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 
+                Pattern explanation:
+                %d{yyyy-MM-dd HH:mm:ss.SSS} - Timestamp
+                [%thread]                   - Thread name
+                %-5level                    - Log level aligned to 5 characters
+                [trace=%mdc{correlation_id:-}] - Prints the correlation_id from MDC, or "-" if missing
+                %logger{36}                 - Logger name (max 36 chars)
+                - %msg                      - The log message itself
+                %n                          - Newline
+            -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [trace=%X{correlation_id:-}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configure base logging levels -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Set framework specific logging levels -->
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.hibernate" level="INFO" />
+    <logger name="io.tntra" level="DEBUG" />
+
+</configuration>

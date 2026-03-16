@@ -21,6 +21,4 @@ public class LuhnAlgorithmTest {
         assertThat(LuhnAlgorithm.maskPan("1234")).isEqualTo("****-****-****-1234");
         assertThat(LuhnAlgorithm.maskPan("4111111111111111")).isEqualTo("****-****-****-1111");
     }
-
-
 }

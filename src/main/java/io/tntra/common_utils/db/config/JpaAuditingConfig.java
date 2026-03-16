@@ -1,6 +1,8 @@
 package io.tntra.common_utils.db.config;
 
 import io.tntra.common_utils.db.auditing.DefaultAuditorAware;
+import jakarta.persistence.EntityManagerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -14,6 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 @Configuration
 @EnableJpaAuditing
+@ConditionalOnBean(EntityManagerFactory.class)
 public class JpaAuditingConfig {
 
     @Bean

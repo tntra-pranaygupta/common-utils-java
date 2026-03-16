@@ -1,6 +1,9 @@
 package io.tntra.common_utils.exception.handler;
 
 import io.tntra.common_utils.exception.types.BaseException;
+import io.tntra.common_utils.exception.types.BusinessException;
+import io.tntra.common_utils.exception.types.ValidationException;
+import io.tntra.common_utils.logging.masking.SensitiveDataMasker;
 import io.tntra.common_utils.response.factory.ResponseFactory;
 import io.tntra.common_utils.response.model.ApiResponse;
 import io.tntra.common_utils.util.CorrelationIdHolder;
@@ -27,12 +30,39 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles all domain/business/platform exceptions derived from {@link BaseException}.
+     * Handles specific domain validation exceptions.
+     */
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(ValidationException ex) {
+        String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
+        String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
+        log.warn("Validation failure: code={}, message={}, correlationId={}", 
+                 ex.getErrorCode(), maskedMessage, correlationId);
+        return responseFactory.error(ex.getErrorCode(), maskedMessage, ex.getHttpStatus().value());
+    }
+
+    /**
+     * Handles specific business exceptions.
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
+        String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
+        String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
+        log.warn("Business rule violation: code={}, message={}, correlationId={}", 
+                 ex.getErrorCode(), maskedMessage, correlationId);
+        return responseFactory.error(ex.getErrorCode(), maskedMessage, ex.getHttpStatus().value());
+    }
+
+    /**
+     * Handles all other domain/business/platform exceptions derived from {@link BaseException}.
      */
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ApiResponse<Void>> handleBaseException(BaseException ex) {
-        log.warn("Domain exception occurred code={}, message={}", ex.getErrorCode(), ex.getMessage());
-        return responseFactory.error(ex.getErrorCode(), ex.getMessage(), ex.getHttpStatus().value());
+        String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
+        String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
+        log.warn("Domain exception occurred: code={}, message={}, correlationId={}", 
+                 ex.getErrorCode(), maskedMessage, correlationId);
+        return responseFactory.error(ex.getErrorCode(), maskedMessage, ex.getHttpStatus().value());
     }
 
     /**
@@ -40,12 +70,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
         String message = ex.getBindingResult().getAllErrors().stream()
                 .findFirst()
                 .map(error -> error.getDefaultMessage())
                 .orElse("Validation failed");
-        log.warn("Request validation failed: {}", message);
-        return responseFactory.error("VALIDATION_ERROR", message, HttpStatus.BAD_REQUEST.value());
+        String maskedMessage = SensitiveDataMasker.maskAll(message);
+        log.warn("Request validation failed: message={}, correlationId={}", maskedMessage, correlationId);
+        return responseFactory.error("VALIDATION_ERROR", maskedMessage, HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -53,12 +85,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(ConstraintViolationException ex) {
+        String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
         String message = ex.getConstraintViolations().stream()
                 .findFirst()
                 .map(v -> v.getMessage())
                 .orElse("Validation failed");
-        log.warn("Constraint violation: {}", message);
-        return responseFactory.error("VALIDATION_ERROR", message, HttpStatus.BAD_REQUEST.value());
+        String maskedMessage = SensitiveDataMasker.maskAll(message);
+        log.warn("Constraint violation: message={}, correlationId={}", maskedMessage, correlationId);
+        return responseFactory.error("VALIDATION_ERROR", maskedMessage, HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -67,7 +101,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnhandled(Exception ex) {
         String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
-        log.error("Unexpected error, correlationId={}", correlationId, ex);
+        String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
+        log.error("Unexpected error: message={}, correlationId={}", maskedMessage, correlationId, ex);
         return responseFactory.error("INTERNAL_ERROR", "An unexpected error occurred",
                 HttpStatus.INTERNAL_SERVER_ERROR.value());
     }

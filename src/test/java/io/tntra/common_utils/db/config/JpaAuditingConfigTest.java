@@ -7,8 +7,11 @@ import org.springframework.data.domain.AuditorAware;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JpaAuditingConfigTest {
+    /**
+     * Should create an AuditorAware bean of type DefaultAuditorAware.
+     */
     @Test
-    void shouldCreateAuditorAwareBean() {
+    void shouldCreateAuditorAwareBeanTest() {
 
         JpaAuditingConfig config = new JpaAuditingConfig();
 

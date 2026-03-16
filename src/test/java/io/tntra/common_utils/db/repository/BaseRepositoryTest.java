@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseRepositoryTest {
+    /**
+     * Should verify that BaseRepository extends JpaRepository.
+     */
     @Test
-    void baseRepositoryShouldExtendJpaRepository() {
+    void baseRepositoryShouldExtendJpaRepositoryTest() {
 
         Class<?>[] interfaces = RepoTestRepository.class.getInterfaces();
 

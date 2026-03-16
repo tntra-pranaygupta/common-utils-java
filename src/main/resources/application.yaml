@@ -1,3 +1,26 @@
 spring:
   application:
     name: common-utils
+
+  # ─── Flyway ───────────────────────────────────────────────────────────────
+  flyway:
+    # Migrations are applied automatically on startup.
+    # The location follows the Flyway convention; Spring Boot auto-discovers
+    # classpath:db/migration by default, so this is explicit for clarity.
+    locations: classpath:db/migration
+    # Baseline allows Flyway to run against a DB that already has tables
+    # (useful when first adopting Flyway against a legacy schema).
+    baseline-on-migrate: false
+    # Fail fast: stop the application if a migration has been modified after
+    # it was applied (prevents silent schema drift in production).
+    validate-on-migrate: true
+    # Encoding used when reading the SQL scripts.
+    encoding: UTF-8
+    # Prefix / separator / suffix conventions (Flyway defaults shown explicitly)
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffix: .sql
+    # Repeatable migrations
+    repeatable-sql-migration-prefix: R
+    # Placeholders can be used inside migration scripts as ${placeholder}
+    placeholder-replacement: true

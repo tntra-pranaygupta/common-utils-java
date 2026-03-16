@@ -1,0 +1,22 @@
+# ─── Test profile: H2 in-memory database ─────────────────────────────────────
+# Active via @ActiveProfiles("test") or spring.profiles.active=test
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: none          # Flyway owns DDL — Hibernate must NOT create tables
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    # In H2 MODE=PostgreSQL most PG syntax works. For SQL that doesn't,
+    # add test-only R__compat.sql repeatable migrations.
