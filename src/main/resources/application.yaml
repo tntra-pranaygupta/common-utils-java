@@ -2,6 +2,19 @@ spring:
   application:
     name: common-utils
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/common_utils_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    open-in-view: false
+
   # ─── Flyway ───────────────────────────────────────────────────────────────
   flyway:
     # Migrations are applied automatically on startup.
