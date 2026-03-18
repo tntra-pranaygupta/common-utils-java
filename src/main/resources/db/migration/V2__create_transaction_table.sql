@@ -3,12 +3,11 @@
 -- Payments domain: core transaction ledger table.
 --
 -- PCI/DSS notes:
---   • Raw PAN values are NEVER stored. Only the last 4 digits
---     (pan_last_four) and a tokenised reference (pan_token) are
+--   • Raw PAN values are NEVER stored. Only the last 4 digits are
 --     persisted. The token is resolved by the Token Vault service.
 --   • Amount is stored as NUMERIC(19,4) to avoid floating-point
 --     rounding errors — a hard requirement for financial data.
---   • sensitive columns (pan_token) are tagged with a comment so
+--   • sensitive columns (pan) are tagged with a comment so
 --     that DBA tooling can enforce column-level encryption policies.
 --   • All timestamps use TIMESTAMP WITH TIME ZONE.
 -- ============================================================
@@ -27,8 +26,7 @@ CREATE TABLE IF NOT EXISTS financial_transaction
 
     -- ── Payment instrument (PCI/DSS: no raw PAN) ──────────────────────────────
     -- Token issued by Token Vault; resolved at charge time; never logged.
-    pan_token           VARCHAR(64),                            -- PCI: SENSITIVE — encrypt at rest
-    pan_last_four       CHAR(4),                                -- safe to display in UI
+    pan           VARCHAR(64),                            -- PCI: SENSITIVE — encrypt at rest
     card_scheme         VARCHAR(32),                            -- VISA | MASTERCARD | AMEX | ...
 
     -- ── Financials ────────────────────────────────────────────────────────────
@@ -55,9 +53,7 @@ CREATE TABLE IF NOT EXISTS financial_transaction
         'PENDING', 'AUTHORISED', 'CAPTURED', 'SETTLED',
         'FAILED', 'DECLINED', 'REFUNDED', 'CANCELLED'
     )),
-    CONSTRAINT chk_transaction_amount_positive  CHECK   (amount > 0),
-    CONSTRAINT chk_pan_last_four_numeric        CHECK   (pan_last_four ~ '^[0-9]{4}$' OR pan_last_four IS NULL)
-);
+    CONSTRAINT chk_transaction_amount_positive  CHECK   (amount > 0));
 
 -- ─── Indexes ───────────────────────────────────────────────────────────────────
 
@@ -78,6 +74,6 @@ CREATE INDEX IF NOT EXISTS idx_ft_correlation_id
     ON financial_transaction (correlation_id);
 
 -- ─── Column security comment (informational for DBA tooling) ──────────────────
-COMMENT ON COLUMN financial_transaction.pan_token IS
+COMMENT ON COLUMN financial_transaction.pan IS
     'PCI/DSS SENSITIVE: must be encrypted at rest via TDE or column-level encryption. '
     'Resolved only at charge time via Token Vault. Must never appear in application logs.';

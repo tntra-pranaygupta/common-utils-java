@@ -46,7 +46,7 @@ class SensitiveDataMaskerTest {
         String expected = "Payment failed for card ****-****-****-4444. Try again next time.";
         assertThat(SensitiveDataMasker.maskEmbeddedPans(input)).isEqualTo(expected);
     }
-    
+
     /**
      * Should mask formatted PANs in text.
      */
@@ -55,7 +55,7 @@ class SensitiveDataMaskerTest {
         String input1 = "Card number 4111-2222-3333-4444 has an issue.";
         String expected1 = "Card number ****-****-****-4444 has an issue.";
         assertThat(SensitiveDataMasker.maskEmbeddedPans(input1)).isEqualTo(expected1);
-        
+
         String input2 = "Here is an Amex 3782 1111 2222 333.";
         String expected2 = "Here is an Amex ****-****-****-*333.";
         assertThat(SensitiveDataMasker.maskEmbeddedPans(input2)).isEqualTo(expected2);
@@ -68,7 +68,7 @@ class SensitiveDataMaskerTest {
     void maskEmbeddedPansShouldNotMaskStandardNumbersTest() {
         String text = "The order 1234 cost $400.00 today.";
         assertThat(SensitiveDataMasker.maskEmbeddedPans(text)).isEqualTo(text);
-        
+
         String text2 = "Phone number is (415) 555-2671.";
         assertThat(SensitiveDataMasker.maskEmbeddedPans(text2)).isEqualTo(text2);
     }
@@ -92,7 +92,7 @@ class SensitiveDataMaskerTest {
         String text = "Send a receipt to jane.smithy@google.com please.";
         String expected = "Send a receipt to ****@google.com please.";
         assertThat(SensitiveDataMasker.maskEmbeddedEmails(text)).isEqualTo(expected);
-        
+
         String nullText = null;
         assertThat(SensitiveDataMasker.maskEmbeddedEmails(null)).isNull();
     }

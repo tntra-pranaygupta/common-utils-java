@@ -1,5 +1,6 @@
 package io.tntra.common_utils.response.factory;
 
+import io.tntra.common_utils.response.model.ApiError;
 import io.tntra.common_utils.response.model.ApiResponse;
 import io.tntra.common_utils.util.CorrelationIdHolder;
 import org.springframework.http.ResponseEntity;

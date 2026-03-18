@@ -36,8 +36,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleValidationException(ValidationException ex) {
         String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
         String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
-        log.warn("Validation failure: code={}, message={}, correlationId={}", 
-                 ex.getErrorCode(), maskedMessage, correlationId);
+        log.warn("Validation failure: code={}, message={}, correlationId={}",
+                ex.getErrorCode(), maskedMessage, correlationId);
         return responseFactory.error(ex.getErrorCode(), maskedMessage, ex.getHttpStatus().value());
     }
 
@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
         String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
         String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
-        log.warn("Business rule violation: code={}, message={}, correlationId={}", 
-                 ex.getErrorCode(), maskedMessage, correlationId);
+        log.warn("Business rule violation: code={}, message={}, correlationId={}",
+                ex.getErrorCode(), maskedMessage, correlationId);
         return responseFactory.error(ex.getErrorCode(), maskedMessage, ex.getHttpStatus().value());
     }
 
@@ -60,8 +60,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleBaseException(BaseException ex) {
         String correlationId = CorrelationIdHolder.getCurrentCorrelationId();
         String maskedMessage = SensitiveDataMasker.maskAll(ex.getMessage());
-        log.warn("Domain exception occurred: code={}, message={}, correlationId={}", 
-                 ex.getErrorCode(), maskedMessage, correlationId);
+        log.warn("Domain exception occurred: code={}, message={}, correlationId={}",
+                ex.getErrorCode(), maskedMessage, correlationId);
         return responseFactory.error(ex.getErrorCode(), maskedMessage, ex.getHttpStatus().value());
     }
 

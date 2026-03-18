@@ -38,28 +38,3 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_entity
 -- Index to support look-ups by who performed an action (GDPR access requests)
 CREATE INDEX IF NOT EXISTS idx_audit_log_performed_by
     ON audit_log (performed_by);
-
--- ─── 2. outbox_event ──────────────────────────────────────────────────────────
--- Transactional outbox pattern: services insert domain events in the same
--- local transaction as the business write; a separate relay process publishes
--- them to the message broker. This guarantees at-least-once delivery without
--- distributed transactions.
-CREATE TABLE IF NOT EXISTS outbox_event
-(
-    id              BIGSERIAL                   NOT NULL,
-    aggregate_type  VARCHAR(128)                NOT NULL,   -- e.g. 'Payment'
-    aggregate_id    VARCHAR(64)                 NOT NULL,   -- aggregate root ID
-    event_type      VARCHAR(128)                NOT NULL,   -- fully qualified event name
-    payload         TEXT                        NOT NULL,   -- JSON payload (no PAN!)
-    status          VARCHAR(32)                 NOT NULL DEFAULT 'PENDING',
-                                                            -- PENDING | PUBLISHED | FAILED
-    created_at      TIMESTAMP WITH TIME ZONE    NOT NULL DEFAULT NOW(),
-    published_at    TIMESTAMP WITH TIME ZONE,
-    retry_count     SMALLINT                    NOT NULL DEFAULT 0,
-
-    CONSTRAINT pk_outbox_event    PRIMARY KEY (id),
-    CONSTRAINT chk_outbox_status  CHECK (status IN ('PENDING', 'PUBLISHED', 'FAILED'))
-);
-
-CREATE INDEX IF NOT EXISTS idx_outbox_event_status
-    ON outbox_event (status);

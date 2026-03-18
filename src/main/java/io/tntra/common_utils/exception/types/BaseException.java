@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
  *
  * <h2>PCI/DSS note</h2>
  * Error messages must never contain raw PAN, CVV, or other sensitive card-holder
- * data. Use {@link io.tntra.common_utils.logging.masking.SensitiveDataMasker} before
+ * data.
  * including any field value in the message string.
  */
 @Getter
